@@ -1,0 +1,15 @@
+header:
+  version: 9
+  includes:
+    - base.yml
+
+machine: qemuarma9
+
+local_conf_header:
+
+  uboot-conf: |
+    # Downgrade u-boot otherwise the vexpress_ca9x4 machine does not exist anymore
+    # FIXME restore in v2022
+    PREFERRED_VERSION:u-boot ?= "2020.01"
+    PREFERRED_PROVIDER:u-boot-fw-utils ?= "libubootenv"
+    PREFERRED_VERSION:u-boot-fw-utils ?= "0.3.2"

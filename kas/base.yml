@@ -1,0 +1,48 @@
+header:
+  version: 9
+
+machine: qemuarma9
+distro: poky
+target: core-image-minimal
+
+defaults:
+  repos:
+    refspec: dunfell
+
+repos:
+  meta-qemuarma9:
+
+  poky:  # Tested at 96a85854fedfd6b3a882ce6394a10ea5ca521689
+    url: https://git.yoctoproject.org/git/poky
+    path: layers/poky
+    layers:
+      meta:
+      meta-poky:
+
+bblayers_conf_header:
+  poky-dev-defaults: |
+    POKY_BBLAYERS_CONF_VERSION = "2"
+    BBPATH = "${TOPDIR}"
+    BBFILES ?= ""
+
+local_conf_header:
+  poky-dev-defaults: |
+    CONF_VERSION = "1"
+    PACKAGE_CLASSES ?= "package_ipk"
+    # Enable password-less root login for dev
+    EXTRA_IMAGE_FEATURES ?= "debug-tweaks"
+    USER_CLASSES ?= "buildstats image-prelink"
+    PATCHRESOLVE = "noop"
+    # Needed for qemu gui, vnc only otherwise
+    PACKAGECONFIG:append:pn-qemu-system-native = " sdl"
+
+  disk-mon: |
+    BB_DISKMON_DIRS ??= "\
+      STOPTASKS,${TMPDIR},1G,100K \
+      STOPTASKS,${DL_DIR},1G,100K \
+      STOPTASKS,${SSTATE_DIR},1G,100K \
+      STOPTASKS,/tmp,100M,100K \
+      ABORT,${TMPDIR},100M,1K \
+      ABORT,${DL_DIR},100M,1K \
+      ABORT,${SSTATE_DIR},100M,1K \
+      ABORT,/tmp,10M,1K"
